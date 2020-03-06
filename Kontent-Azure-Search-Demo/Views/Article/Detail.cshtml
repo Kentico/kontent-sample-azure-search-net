@@ -1,0 +1,15 @@
+﻿@model Kentico.Kontent.Delivery.ContentItem
+@{
+    ViewData["Title"] = Model.GetString("title");
+}
+
+@if (Model.GetAssets("teaser_image").Count() > 0)
+{
+    var image = Model.GetAssets("teaser_image").First();
+    <img src="@image.Url" alt="@image.Description" />
+}
+
+<h1>@Model.GetString("title")</h1>
+
+@Html.Raw(Model.GetString("body_copy"))
+

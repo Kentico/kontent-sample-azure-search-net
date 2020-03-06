@@ -1,0 +1,35 @@
+﻿@model Microsoft.Azure.Search.Models.DocumentSearchResult<Article>
+@{
+    ViewData["Title"] = "Search Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Index actions</h1>
+    <a class="btn btn-danger" asp-controller="Search" asp-action="create">Create index</a>
+    <a class="btn btn-primary" asp-controller="Search" asp-action="initialize">Initialize index</a>
+    <br />
+    @ViewData["Message"]
+</div>
+
+@{
+    if (Model != null)
+    {
+
+        <h2>@Model.Count Results</h2>
+
+        foreach (var result in Model.Results)
+        {
+            <div>
+                <h3>
+                    <a asp-controller="article" asp-action="detail" asp-route-urlPattern="@result.Document.UrlPattern">
+                        @result.Document.Title
+                    </a>
+                </h3>
+                <p>
+                    @result.Document.Summary
+                </p>
+            </div>
+        }
+    }
+}
+
