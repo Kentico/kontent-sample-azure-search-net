@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Kontent_Azure_Search_Demo</RootNamespace>
+    <UserSecretsId>9708adb5-2a1c-4db9-a157-99c6a4fa4e16</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
