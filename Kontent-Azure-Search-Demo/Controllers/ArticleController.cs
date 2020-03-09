@@ -10,17 +10,17 @@ namespace Kontent_Azure_Search_Demo.Controllers
 {
     public class ArticleController : Controller
     {
-        private readonly string projectId;
+        private readonly KontentHelper kontentHelper;
 
         public ArticleController(IConfiguration configuration)
         {
-            projectId = configuration["KontentProjectID"];
+            kontentHelper = new KontentHelper(configuration);
         }
 
         [Route("article/{urlPattern}")]
         public async Task<IActionResult> Detail(string urlPattern)
         {
-            var item = await KontentHelper.GetArticleByUrlPattern(projectId, urlPattern);
+            var item = await kontentHelper.GetArticleByUrlPattern(urlPattern);
             return View(item);
         }
     }

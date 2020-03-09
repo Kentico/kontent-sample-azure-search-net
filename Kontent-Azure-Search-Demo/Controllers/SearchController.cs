@@ -13,27 +13,24 @@ namespace Kontent_Azure_Search_Demo.Controllers
 {
     public class SearchController : Controller
     {
-        private readonly string indexName;
-        private readonly string projectId;
-        private readonly string webhookSecret;
-        private ISearchIndexClient indexClient;
-        private SearchServiceClient searchServiceClient;
+        private readonly KontentHelper kontentHelper;
+        private readonly SearchHelper searchHelper;
+        private readonly KontentWebhookHelper kontentWebhookHelper;
 
         public SearchController(IConfiguration configuration)
         {
-            projectId = configuration["KontentProjectID"];
-            indexName = configuration["SearchIndexName"];
-            webhookSecret = configuration["KontentWebhookSecret"];
-            searchServiceClient = SearchHelper.CreateSearchServiceClient(configuration);
-            indexClient = searchServiceClient.Indexes.GetClient(indexName);
+            kontentHelper = new KontentHelper(configuration);
+            searchHelper = new SearchHelper(configuration);
+            kontentWebhookHelper = new KontentWebhookHelper(configuration);
         }
 
         public IActionResult Create()
         {
-            SearchHelper.DeleteIndexIfExists(indexName, searchServiceClient);
-            SearchHelper.CreateIndex<Article>(indexName, searchServiceClient);
+            searchHelper.DeleteIndexIfExists();
+            searchHelper.CreateIndex<Article>();
+            
+            ViewData["Message"] = "Index deleted/created.";
 
-            ViewData["Message"] = $"{indexName} deleted/created.";
             return View("Index");
         }
 
@@ -43,18 +40,17 @@ namespace Kontent_Azure_Search_Demo.Controllers
                 return View();
             }
 
-            var indexClient = searchServiceClient.Indexes.GetClient(indexName);
-            var results = SearchHelper.QueryIndex<Article>(indexClient, searchText);
+            var results = searchHelper.QueryIndex<Article>(searchText);
 
             return View(results);
         }
 
         public IActionResult Initialize()
         {
-            var articles = KontentHelper.GetArticlesForSearch(projectId).Result;
-            SearchHelper.AddToIndex<Article>(indexClient, articles);
+            var articles = kontentHelper.GetArticlesForSearch().Result;
+            searchHelper.AddToIndex<Article>(articles);
 
-            ViewData["Message"] = $"{indexName} initialized.";
+            ViewData["Message"] = "Index initialized.";
             return View("Index");
         }
         
@@ -68,7 +64,7 @@ namespace Kontent_Azure_Search_Demo.Controllers
                 bodyRaw = await reader.ReadToEndAsync();
             }
 
-            var isValid = KontentWebhookHelper.ValidateWebhook(Request.Headers["X-KC-Signature"], bodyRaw, webhookSecret);
+            var isValid = kontentWebhookHelper.ValidateWebhook(Request.Headers["X-KC-Signature"], bodyRaw);
             if (!isValid)
             {
                 return "Invalid signature";
@@ -99,14 +95,14 @@ namespace Kontent_Azure_Search_Demo.Controllers
 
             if (isPublishevent)
             {
-                var articlesToUpdate = KontentHelper.GetArticlesForSearch(projectId, effectedArticles.Select(a => a.Id)).Result;
-                SearchHelper.AddToIndex(indexClient, articlesToUpdate);
+                var articlesToUpdate = kontentHelper.GetArticlesForSearch(effectedArticles.Select(a => a.Id)).Result;
+                searchHelper.AddToIndex(articlesToUpdate);
             }
 
             if (isUnpublishEvent)
             {
                 var articlesToRemove = effectedArticles.Select(a => new Article { ID = a.Id });
-                SearchHelper.RemoveFromIndex(indexClient, articlesToRemove);
+                searchHelper.RemoveFromIndex(articlesToRemove);
             }
 
             return "Updated index";

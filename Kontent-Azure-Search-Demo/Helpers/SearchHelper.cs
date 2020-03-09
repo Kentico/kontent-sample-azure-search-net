@@ -10,14 +10,25 @@ namespace Kontent_Azure_Search_Demo.Helpers
 {
     public class SearchHelper
     {
-        public static void AddToIndex<T>(ISearchIndexClient indexClient, IEnumerable<T> documents)
+        private readonly string indexName;
+        private readonly SearchServiceClient searchServiceClient;
+        private readonly ISearchIndexClient searchIndexClient;
+
+        public SearchHelper(IConfiguration configuration)
+        {
+            indexName = configuration["SearchIndexName"];
+            searchServiceClient = CreateSearchServiceClient(configuration);
+            searchIndexClient = searchServiceClient.Indexes.GetClient(indexName);
+        }
+
+        public void AddToIndex<T>(IEnumerable<T> documents)
         {
             var actions = documents.Select(a => IndexAction.Upload(a));
             var batch = IndexBatch.New(actions);
-            indexClient.Documents.Index(batch);
+            searchIndexClient.Documents.Index(batch);
         }
 
-        public static void CreateIndex<T>(string indexName, SearchServiceClient serviceClient)
+        public void CreateIndex<T>()
         {
             var definition = new Index()
             {
@@ -25,37 +36,36 @@ namespace Kontent_Azure_Search_Demo.Helpers
                 Fields = FieldBuilder.BuildForType<T>()
             };
 
-            serviceClient.Indexes.Create(definition);
+            searchServiceClient.Indexes.Create(definition);
         }
 
-        public static SearchServiceClient CreateSearchServiceClient(IConfiguration configuration)
+        private SearchServiceClient CreateSearchServiceClient(IConfiguration configuration)
         {
             string searchServiceName = configuration["SearchServiceName"];
             string adminApiKey = configuration["SearchServiceAdminApiKey"];
 
-            SearchServiceClient serviceClient = new SearchServiceClient(searchServiceName, new SearchCredentials(adminApiKey));
-            return serviceClient;
+            return new SearchServiceClient(searchServiceName, new SearchCredentials(adminApiKey));
         }
 
-        public static void DeleteIndexIfExists(string indexName, SearchServiceClient serviceClient)
+        public void DeleteIndexIfExists()
         {
-            if (serviceClient.Indexes.Exists(indexName))
+            if (searchServiceClient.Indexes.Exists(indexName))
             {
-                serviceClient.Indexes.Delete(indexName);
+                searchServiceClient.Indexes.Delete(indexName);
             }
         }
 
-        public static DocumentSearchResult<T> QueryIndex<T>(ISearchIndexClient indexClient, string searchText)
+        public DocumentSearchResult<T> QueryIndex<T>(string searchText)
         {
             var parameters = new SearchParameters();
-            return indexClient.Documents.Search<T>(searchText, parameters);
+            return searchIndexClient.Documents.Search<T>(searchText, parameters);
         }
         
-        public static void RemoveFromIndex<T>(ISearchIndexClient indexClient, IEnumerable<T> documents)
+        public void RemoveFromIndex<T>(IEnumerable<T> documents)
         {
             var actions = documents.Select(a => IndexAction.Delete(a));
             var batch = IndexBatch.New(actions);
-            indexClient.Documents.Index(batch);
+            searchIndexClient.Documents.Index(batch);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Kentico.Kontent.Delivery;
 using Kontent_Azure_Search_Demo.Models;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +12,17 @@ namespace Kontent_Azure_Search_Demo.Helpers
 {
     public class KontentHelper
     {
-        public static async Task<ContentItem> GetArticleByUrlPattern(string projectId, string urlPattern)
+        private readonly IDeliveryClient deliveryClient;
+        private readonly string webhookSecret;
+
+        public KontentHelper(IConfiguration configuration)
         {
-            var client = DeliveryClientBuilder.WithProjectId(projectId).Build();
+            var projectId = configuration["KontentProjectID"];
+            this.deliveryClient = DeliveryClientBuilder.WithProjectId(projectId).Build();
+        }
+
+        public async Task<ContentItem> GetArticleByUrlPattern(string urlPattern)
+        {
             var parameters = new List<IQueryParameter>
             {
                 new EqualsFilter("system.type", "article"),
@@ -21,27 +30,25 @@ namespace Kontent_Azure_Search_Demo.Helpers
                 new LimitParameter(1)
             };
 
-            var response = await client.GetItemsAsync(parameters);
+            var response = await deliveryClient.GetItemsAsync(parameters);
             return response.Items.FirstOrDefault();
         }
 
-        public static async Task<IEnumerable<Article>> GetArticlesForSearch(string projectId)
+        public async Task<IEnumerable<Article>> GetArticlesForSearch()
         {
-            var client = DeliveryClientBuilder.WithProjectId(projectId).Build();
             var parameters = new List<IQueryParameter>
             {
                 new EqualsFilter("system.type", "article"),
                 new OrderParameter("elements.post_date", SortOrder.Descending)
             };
 
-            var response = await client.GetItemsAsync(parameters);
+            var response = await deliveryClient.GetItemsAsync(parameters);
 
             return response.Items.Select(GetArticle);
         }
         
-        public static async Task<IEnumerable<Article>> GetArticlesForSearch(string projectId, IEnumerable<string> ids)
+        public async Task<IEnumerable<Article>> GetArticlesForSearch(IEnumerable<string> ids)
         {
-            var client = DeliveryClientBuilder.WithProjectId(projectId).Build();
             var parameters = new List<IQueryParameter>
             {
                 new EqualsFilter("system.type", "article"),
@@ -49,11 +56,11 @@ namespace Kontent_Azure_Search_Demo.Helpers
                 new LimitParameter(1)
             };
 
-            var response = await client.GetItemsAsync(parameters);
+            var response = await deliveryClient.GetItemsAsync(parameters);
             return response.Items.Select(GetArticle);
         }
         
-        private static Article GetArticle(ContentItem item)
+        private Article GetArticle(ContentItem item)
         {
             if (item == null)
             {
