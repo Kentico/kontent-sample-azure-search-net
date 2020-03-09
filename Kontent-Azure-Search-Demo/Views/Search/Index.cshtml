@@ -1,4 +1,4 @@
-﻿@model Microsoft.Azure.Search.Models.DocumentSearchResult<Article>
+﻿@model IEnumerable<Article>
 @{
     ViewData["Title"] = "Search Page";
 }
@@ -17,16 +17,16 @@
 
         <h2>@Model.Count Results</h2>
 
-        foreach (var result in Model.Results)
+        foreach (var document in Model)
         {
             <div>
                 <h3>
-                    <a asp-controller="article" asp-action="detail" asp-route-urlPattern="@result.Document.UrlPattern">
-                        @result.Document.Title
+                    <a asp-controller="article" asp-action="detail" asp-route-urlPattern="@document.UrlPattern">
+                        @document.Title
                     </a>
                 </h3>
                 <p>
-                    @result.Document.Summary
+                    @document.Summary
                 </p>
             </div>
         }

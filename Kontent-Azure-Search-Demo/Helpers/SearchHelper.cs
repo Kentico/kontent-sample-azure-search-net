@@ -46,10 +46,11 @@ namespace Kontent_Azure_Search_Demo.Helpers
             }
         }
 
-        public DocumentSearchResult<T> QueryIndex<T>(string searchText)
+        public IEnumerable<T> QueryIndex<T>(string searchText)
         {
             var parameters = new SearchParameters();
-            return searchIndexClient.Documents.Search<T>(searchText, parameters);
+            var results = searchIndexClient.Documents.Search<T>(searchText, parameters);
+            return results.Results.Select(r=>r.Document);
         }
 
         public void RemoveFromIndex<T>(IEnumerable<T> documents)

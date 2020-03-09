@@ -2,7 +2,6 @@
 using Kontent_Azure_Search_Demo.KontentWebhookModels;
 using Kontent_Azure_Search_Demo.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Search;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System.IO;
