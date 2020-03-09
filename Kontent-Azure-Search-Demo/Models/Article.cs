@@ -14,14 +14,13 @@ namespace Kontent_Azure_Search_Demo.Models
         [Key]
         public string ID { get; set; }
 
-        [IsSortable]
         public DateTime? PostDate { get; set; }
 
         [IsSearchable]
         [Analyzer(AnalyzerName.AsString.EnMicrosoft)]
         public string Summary { get; set; }
 
-        [IsSearchable, IsSortable]
+        [IsSearchable]
         [Analyzer(AnalyzerName.AsString.EnMicrosoft)]
         public string Title { get; set; }
 
