@@ -1,5 +1,4 @@
-﻿using Kontent_Azure_Search_Demo.Models;
-using Microsoft.Azure.Search;
+﻿using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
@@ -11,9 +10,9 @@ namespace Kontent_Azure_Search_Demo.Helpers
     public class SearchHelper
     {
         private readonly string indexName;
-        private readonly SearchServiceClient searchServiceClient;
         private readonly ISearchIndexClient searchIndexClient;
-
+        private readonly SearchServiceClient searchServiceClient;
+        
         public SearchHelper(IConfiguration configuration)
         {
             indexName = configuration["SearchIndexName"];
@@ -39,14 +38,6 @@ namespace Kontent_Azure_Search_Demo.Helpers
             searchServiceClient.Indexes.Create(definition);
         }
 
-        private SearchServiceClient CreateSearchServiceClient(IConfiguration configuration)
-        {
-            string searchServiceName = configuration["SearchServiceName"];
-            string adminApiKey = configuration["SearchServiceAdminApiKey"];
-
-            return new SearchServiceClient(searchServiceName, new SearchCredentials(adminApiKey));
-        }
-
         public void DeleteIndexIfExists()
         {
             if (searchServiceClient.Indexes.Exists(indexName))
@@ -60,12 +51,20 @@ namespace Kontent_Azure_Search_Demo.Helpers
             var parameters = new SearchParameters();
             return searchIndexClient.Documents.Search<T>(searchText, parameters);
         }
-        
+
         public void RemoveFromIndex<T>(IEnumerable<T> documents)
         {
             var actions = documents.Select(a => IndexAction.Delete(a));
             var batch = IndexBatch.New(actions);
             searchIndexClient.Documents.Index(batch);
+        }
+
+        private SearchServiceClient CreateSearchServiceClient(IConfiguration configuration)
+        {
+            string searchServiceName = configuration["SearchServiceName"];
+            string adminApiKey = configuration["SearchServiceAdminApiKey"];
+
+            return new SearchServiceClient(searchServiceName, new SearchCredentials(adminApiKey));
         }
     }
 }
