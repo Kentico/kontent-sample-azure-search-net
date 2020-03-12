@@ -13,8 +13,8 @@ namespace Kontent_Azure_Search_Demo.Controllers
     public class SearchController : Controller
     {
         private readonly KontentHelper kontentHelper;
-        private readonly SearchHelper searchHelper;
         private readonly KontentWebhookHelper kontentWebhookHelper;
+        private readonly SearchHelper searchHelper;
 
         public SearchController(IConfiguration configuration)
         {

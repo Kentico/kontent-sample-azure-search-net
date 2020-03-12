@@ -1,11 +1,8 @@
 ﻿using Kentico.Kontent.Delivery;
 using Kontent_Azure_Search_Demo.Models;
 using Microsoft.Extensions.Configuration;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Kontent_Azure_Search_Demo.Helpers
@@ -13,7 +10,6 @@ namespace Kontent_Azure_Search_Demo.Helpers
     public class KontentHelper
     {
         private readonly IDeliveryClient deliveryClient;
-        private readonly string webhookSecret;
 
         public KontentHelper(IConfiguration configuration)
         {
@@ -46,7 +42,7 @@ namespace Kontent_Azure_Search_Demo.Helpers
 
             return response.Items.Select(GetArticle);
         }
-        
+
         public async Task<IEnumerable<Article>> GetArticlesForSearch(IEnumerable<string> ids)
         {
             var parameters = new List<IQueryParameter>
@@ -59,7 +55,7 @@ namespace Kontent_Azure_Search_Demo.Helpers
             var response = await deliveryClient.GetItemsAsync(parameters);
             return response.Items.Select(GetArticle);
         }
-        
+
         private Article GetArticle(ContentItem item)
         {
             if (item == null)
