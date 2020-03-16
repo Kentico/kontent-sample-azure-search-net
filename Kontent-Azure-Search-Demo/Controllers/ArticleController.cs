@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Kontent_Azure_Search_Demo.Helpers;
+﻿using Kontent_Azure_Search_Demo.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using System.Threading.Tasks;
 
 namespace Kontent_Azure_Search_Demo.Controllers
 {
