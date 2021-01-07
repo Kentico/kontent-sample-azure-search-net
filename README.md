@@ -2,6 +2,13 @@
 
 This is a sample .NET Core 3.1 web application with a basic integration of Kentico Kontent with Azure Cognitive Search. It will handle creating, initializing, updating, and searching an index for the articles in the Dancing Goat sample project.
 
+---
+**Use Kentico Search API to provide an advanced search for your website**
+
+Let your visitors search your website in Kontent with the [community-built Kentico Search API](https://github.com/xantari/Kentico.Search.Api). It utilizes Microsoft Cognitive Search and Azure Blob Storage and provides a framework for creating an Azure Search based synchronization infrastructure.
+
+---
+
 ## Requirements
 
 * .NET Core 3.1
